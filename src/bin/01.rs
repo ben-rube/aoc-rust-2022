@@ -14,12 +14,12 @@ fn core_processing(input: &str) -> Vec<usize> {
     let split_lines: Vec<&str> = input.split("\n\n").collect();
 
     for elf in split_lines {
-        let calories: Vec<&str> = elf.split("\n").collect();
+        let calories: Vec<&str> = elf.split('\n').collect();
 
         all_calories.push(
             calories
                 .iter()
-                .map(|v| v.parse::<usize>().unwrap_or_else(|_| 0))
+                .map(|v| v.parse::<usize>().unwrap_or(0))
                 .collect::<Vec<_>>()
                 .iter()
                 .sum(),
@@ -27,7 +27,7 @@ fn core_processing(input: &str) -> Vec<usize> {
     }
 
     all_calories.sort_by(|a, b| b.cmp(a));
-    return all_calories;
+    all_calories
 }
 
 fn main() {
