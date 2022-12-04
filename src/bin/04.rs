@@ -1,13 +1,11 @@
 pub fn part_one(input: &str) -> Option<u32> {
     let converted_zones = convert_input(input);
-    let conflicts = find_complete_overlap(converted_zones);
-    Some(conflicts)
+    Some(find_complete_overlap(converted_zones))
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
     let converted_zones = convert_input(input);
-    let conflicts = find_any_overlap(converted_zones);
-    Some(conflicts)
+    Some(find_any_overlap(converted_zones))
 }
 
 fn convert_input(input: &str) -> Vec<u32> {
