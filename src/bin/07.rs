@@ -1,6 +1,6 @@
 use std::{collections::HashMap, path::PathBuf, str::FromStr};
 
-enum FileEntry {
+enum FileStructure {
     Dir(PathBuf),
     File(usize),
 }
@@ -21,28 +21,28 @@ pub fn part_two(input: &str) -> Option<usize> {
     Some(delete_space(state))
 }
 
-fn calculate_size(tree: &HashMap<PathBuf, Vec<FileEntry>>, path: &PathBuf) -> usize {
+fn calculate_size(tree: &HashMap<PathBuf, Vec<FileStructure>>, path: &PathBuf) -> usize {
     tree[path]
         .iter()
         .map(|e| match e {
-            FileEntry::Dir(path) => calculate_size(tree, path),
-            FileEntry::File(size) => *size,
+            FileStructure::Dir(path) => calculate_size(tree, path),
+            FileStructure::File(size) => *size,
         })
         .sum()
 }
 
-fn delete_space(state: HashMap<PathBuf, Vec<FileEntry>>) -> usize {
-    let free_space = 70000000 - calculate_size(&state, &PathBuf::from_str("/").unwrap());
+fn delete_space(state: HashMap<PathBuf, Vec<FileStructure>>) -> usize {
+    let total_space = 70000000 - calculate_size(&state, &PathBuf::from_str("/").unwrap());
     state
         .iter()
-        .map(|e| calculate_size(&state, e.0))
-        .filter(|size| *size >= 30000000 - free_space)
+        .map(|p| calculate_size(&state, p.0))
+        .filter(|file_size| *file_size >= 30000000 - total_space)
         .min()
         .unwrap()
 }
 
-fn parse_input(input: &str) -> HashMap<PathBuf, Vec<FileEntry>> {
-    let mut state: HashMap<PathBuf, Vec<FileEntry>> = HashMap::new();
+fn parse_input(input: &str) -> HashMap<PathBuf, Vec<FileStructure>> {
+    let mut state: HashMap<PathBuf, Vec<FileStructure>> = HashMap::new();
     let mut in_dir = PathBuf::from_str("/").unwrap();
 
     for line in input.trim().lines() {
@@ -67,13 +67,19 @@ fn parse_input(input: &str) -> HashMap<PathBuf, Vec<FileEntry>> {
             let dir = in_dir.join(name);
 
             state.entry(dir.clone()).or_default();
-            state.get_mut(&in_dir).unwrap().push(FileEntry::Dir(dir))
+            state
+                .get_mut(&in_dir)
+                .unwrap()
+                .push(FileStructure::Dir(dir))
         } else {
             let file = line
                 .split_once(' ')
                 .map(|(size, _)| size.parse::<usize>().unwrap_or(0))
                 .unwrap();
-            state.get_mut(&in_dir).unwrap().push(FileEntry::File(file));
+            state
+                .get_mut(&in_dir)
+                .unwrap()
+                .push(FileStructure::File(file));
         }
     }
     state
